@@ -1,6 +1,10 @@
 server{
   listen 8080;
   location / {
+    # Configuration for eventsource
+    proxy_buffering off;
+    proxy_cache off;
+    gzip off;
     proxy_hide_header 'Access-Control-Allow-Origin';
     add_header 'Access-Control-Allow-Origin' $http_origin always;
     proxy_set_header {{ proxy_identification_header }} true;
