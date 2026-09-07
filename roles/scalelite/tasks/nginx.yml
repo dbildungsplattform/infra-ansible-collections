@@ -43,12 +43,14 @@
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_nginx_group_id }}"
   when: scalelite_greenlight_enabled
+  notify: Restart scalelite-nginx
 
 - name: Delete Greenlight Nginx config
   file:
     path: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx"
     state: absent
   when: not scalelite_greenlight_enabled
+  notify: Restart scalelite-nginx
 
 - name: Copy Nginx metrics configuration
   template:
@@ -57,6 +59,7 @@
     mode: "0600"
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_nginx_group_id }}"
+  notify: Restart scalelite-nginx
 
 - name: Install python-passlib
   package:
@@ -71,6 +74,7 @@
     mode: "0600"
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_nginx_group_id }}"
+  notify: Restart scalelite-nginx
 
 - name: Create nginx log directory
   file:
