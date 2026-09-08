@@ -4,8 +4,8 @@
 - name: Ansible Kubernetes role
   throttle: 1
   vars:
-    proxy_user: "{{ generate_kubeconfigs_proxy_user }}"
-    proxy_pass: "{{ generate_kubeconfigs_proxy_pass }}"
+    proxy_user: "{{ generate_kubeconfigs_proxy_user_awx }}"
+    proxy_pass: "{{ generate_kubeconfigs_proxy_pass_awx }}"
   ansible.builtin.import_role:
     name: dbildungscloud.infra.get_ionos_kubeconfig
   when: awx_job_id is defined
@@ -87,15 +87,15 @@
   block:
     - name: Create service accounts and generate kubeconfigs
       vars:
-        create_clusterrole: false
-        clusterrole_name: "{{ item.1.role }}"
-        serviceaccount_name: "{{ item.0.serviceaccount_name | default(item.0.name, true) }}"
-        serviceaccount_role_binding: "{{ 'RoleBinding' if item.1.namespace is defined else 'ClusterRoleBinding' }}"
-        serviceaccount_namespace: "{{ item.1.namespace | default('default', true) }}"
-        proxy_user: "{{ item.0.name }}"
-        generate_new_token: "{{ item.0.name in  }}"
-        kubeconfig_destination: /tmp/{{ item.0.name }}/{{ generate_kubeconfigs_cluster_name }}.yaml
-      ansible.builtin.include_tasks: "task_files/serviceaccounts.yml"
+        _create_clusterrole: false
+        _clusterrole_name: "{{ item.1.role }}"
+        _serviceaccount_name: "{{ item.0.serviceaccount_name | default(item.0.name, true) }}"
+        _serviceaccount_role_binding: "{{ 'RoleBinding' if item.1.namespace is defined else 'ClusterRoleBinding' }}"
+        _serviceaccount_namespace: "{{ item.1.namespace | default('default', true) }}"
+        _proxy_user: "{{ item.0.name }}"
+        _generate_new_token: "{{ item.0.name in  }}"
+        _kubeconfig_destination: /tmp/{{ item.0.name }}/{{ generate_kubeconfigs_cluster_name }}.yaml
+      ansible.builtin.include_tasks: "serviceaccounts.yml"
       when: inventory_hostname in (lookup('inventory_hostnames', item.1.hosts) | default('', true)).split(',')
       loop: "{{ generate_kubeconfigs_present_users | subelements('permissions.kubernetes', skip_missing=True) }}"
       loop_control:
@@ -104,9 +104,9 @@
       # noqa: run-once[task]
       run_once: true
       vars:
-        user: "{{ item.name }}"
-        personal: "{{ item.personal }}"
-      ansible.builtin.include_tasks: "task_files/upload-kubeconfig.yml"
+        _user: "{{ item.name }}"
+        _personal: "{{ item.personal }}"
+      ansible.builtin.include_tasks: "upload-kubeconfig.yml"
       loop: "{{ generate_kubeconfigs_present_users }}"
   always:
     - name: Cleanup temporary files

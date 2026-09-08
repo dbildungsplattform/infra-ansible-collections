@@ -5,8 +5,8 @@ generate_kubeconfigs_kubeconfigs_vault: "{{ kubeconfigs_vault }}"
 generate_kubeconfigs_proxy_vault: "{{ proxy_vault }}"
 generate_kubeconfigs_proxy_url: "{{ proxy_url }}"
 generate_kubeconfigs_proxy_headers: "{{ proxy_headers }}"
-generate_kubeconfigs_proxy_user: "awx"
-generate_kubeconfigs_proxy_pass: |-
+generate_kubeconfigs_proxy_user_awx: "awx"
+generate_kubeconfigs_proxy_pass_awx: |-
       {{ lookup('dbildungscloud.onepwd.onepwd',
             secret_name='awx',
             vault=generate_kubeconfigs_proxy_vault,
