@@ -25,7 +25,8 @@ jobs:
         with:
           setup_python: "true"
           python_version: "3.14"
-          requirements_file: "./collections/requirements.yml"
+          # requirements_file: "./collections/requirements.yml"
+          working_directory: "roles/generate_kubeconfigs"
           args: "--sarif-file ${{ env.ANSIBLE_LINT_SARIF_FILE }} --exclude .ansible"
       - name: upload ansible-lint results
         if: ${{ always() }}
