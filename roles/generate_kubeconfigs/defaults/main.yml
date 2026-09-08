@@ -1,0 +1,20 @@
+
+generate_kubeconfigs_kubeconfig: "{{ kubeconfig }}"
+generate_kubeconfigs_kubeconfigs_vault: "{{ kubeconfigs_vault }}"
+
+generate_kubeconfigs_proxy_vault: "{{ proxy_vault }}"
+generate_kubeconfigs_proxy_url: "{{ proxy_url }}"
+generate_kubeconfigs_proxy_headers: "{{ proxy_headers }}"
+generate_kubeconfigs_proxy_user: "awx"
+generate_kubeconfigs_proxy_pass: |-
+      {{ lookup('dbildungscloud.onepwd.onepwd',
+            secret_name='awx',
+            vault=generate_kubeconfigs_proxy_vault,
+            session_shorthand='ansible-run',
+            credentials=op_credentials) }}
+
+generate_kubeconfigs_present_users: "{{ present_users }}"
+generate_kubeconfigs_absent_users: "{{ absent_users }}"
+generate_kubeconfigs_regenerate_users: "{{ regenerate_users }}"
+
+generate_kubeconfigs_cluster_name: "{{ cluster_name }}"
