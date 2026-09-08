@@ -1,4 +1,3 @@
-
 generate_kubeconfigs_kubeconfig: "{{ kubeconfig }}"
 generate_kubeconfigs_kubeconfigs_vault: "{{ kubeconfigs_vault }}"
 

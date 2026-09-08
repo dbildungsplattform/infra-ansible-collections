@@ -93,7 +93,7 @@
         _serviceaccount_role_binding: "{{ 'RoleBinding' if item.1.namespace is defined else 'ClusterRoleBinding' }}"
         _serviceaccount_namespace: "{{ item.1.namespace | default('default', true) }}"
         _proxy_user: "{{ item.0.name }}"
-        _generate_new_token: "{{ item.0.name in  }}"
+        _generate_new_token: "{{ item.0.name in generate_kubeconfigs_regenerate_users }}"
         _kubeconfig_destination: /tmp/{{ item.0.name }}/{{ generate_kubeconfigs_cluster_name }}.yaml
       ansible.builtin.include_tasks: "serviceaccounts.yml"
       when: inventory_hostname in (lookup('inventory_hostnames', item.1.hosts) | default('', true)).split(',')
