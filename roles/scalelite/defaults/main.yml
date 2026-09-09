@@ -214,9 +214,7 @@ scalelite_robots_txt: |
 
 scalelite_autoscaler_user_id: 65534
 scalelite_autoscaler_group_id: 65534
-scalelite_autoscaler_image_repository: ghcr.io/dbildungsplattform/infra-autoscaler
-# 2.0.0
-scalelite_autoscaler_image_digest: sha256:95cf770296448cea86e775f6622a5caa9d09fa02e5b0ce29ceeadc59cf1ed531
+scalelite_autoscaler_image: ghcr.io/dbildungsplattform/infra-autoscaler@sha256:386c018d0c3a8df1a3f03bc5181a6246ea742ee8ae64a589cef131e0d0b3d19c
 scalelite_autoscaler_metrics_private_port: 9199
 # Autoscaler config as YAML
 scalelite_autoscaler_config: {}
