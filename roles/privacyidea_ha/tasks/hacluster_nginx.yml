@@ -72,6 +72,27 @@
       */5 * * * * www-data /opt/privacyidea/virtualenv/bin/privacyidea-cron run_scheduled
     mode: '0644'
 
+- name: Create the PrivacyIDEA audit rotation cronjob
+  copy:
+    dest: /etc/privacyidea/privacyidea_audit_rotate_cron
+    content: "0 0 * * * www-data {{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }} --chunksize  {{ privacyidea_audit_chunksize | int }}"
+    mode: '0644'
+  when:
+    - (groups[unique_ha_group] | sort | last) == inventory_hostname # node that is not main node, 'not is_main_node' would be problematic if > 2 nodes
+    - (privacyidea_audit_rotate_days | int) > 0
+
+- name: Configure audit log rotation cronjob
+  ansible.builtin.cron:
+    name: "rotate privacyidea audit logs"
+    special_time: "daily"
+    user: www-data
+    cron_file: privacyidea-audit-rotate
+    job: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }} --chunksize  {{ privacyidea_audit_chunksize | int }}"
+  when:
+  - (groups[unique_ha_group] | sort | last) == inventory_hostname # node that is not main node, 'not is_main_node' would be problematic if > 2 nodes
+  - (privacyidea_audit_rotate_days | int) > 0
+
+
 - name: Create Symlink for Cron Job
   pcs_resource:
     name: "privacyidea_cron_symlink"
