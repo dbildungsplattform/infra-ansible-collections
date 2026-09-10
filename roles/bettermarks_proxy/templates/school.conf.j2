@@ -1,6 +1,10 @@
 server{
   listen 8080;
   location /app/free-betty/content/content_exercises {
+    # Configuration for eventsource
+    proxy_buffering off;
+    proxy_cache off;
+    gzip off;
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
@@ -29,6 +33,10 @@ server{
     sub_filter_types text/html;
   }
   location /config/user {
+    # Configuration for eventsource
+    proxy_buffering off;
+    proxy_cache off;
+    gzip off;
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
@@ -58,6 +66,10 @@ server{
     sub_filter_types application/json;
   }
   location / {
+    # Configuration for eventsource
+    proxy_buffering off;
+    proxy_cache off;
+    gzip off;
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
