@@ -79,7 +79,6 @@
     mode: '0644'
   when:
     - (groups[unique_ha_group] | sort | last) == inventory_hostname # node that is not main node, 'not is_main_node' would be problematic if > 2 nodes
-    - (privacyidea_audit_rotate_days | int) > 0
 
 - name: Configure audit log rotation cronjob
   ansible.builtin.cron:
