@@ -46,7 +46,7 @@
     special_time: "daily"
     user: www-data
     cron_file: privacyidea-audit-rotate
-    job: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }}"
+    job: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }} --chunksize {{ privacyidea_audit_chunksize | int }}"
   when: (privacyidea_audit_rotate_days | int) > 0
 
 - name: Copy admin SQL resolver configuration file

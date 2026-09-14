@@ -49,9 +49,9 @@
     special_time: "daily"
     user: www-data
     cron_file: privacyidea-audit-rotate
-    job: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }}"
+    job: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage audit rotate --age {{ privacyidea_audit_rotate_days | int }} --chunksize {{ privacyidea_audit_chunksize | int }}"
   when:
-    - is_main_node
+    - (groups[unique_ha_group] | sort | last) == inventory_hostname # node that is not main node, 'not is_main_node' would be problematic if > 2 nodes
     - (privacyidea_audit_rotate_days | int) > 0
 
 - name: Copy admin SQL resolver configuration file
