@@ -38,9 +38,7 @@
   command: "{{ privacyidea_dir }}/virtualenv/bin/privacyidea-schema-upgrade -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
   environment:
     PATH: "{{ privacyidea_dir }}/virtualenv/bin:{{ ansible_env.PATH }}"
-  when:
-    - install_privacyidea_result is changed
-    - is_main_node
+  when: is_main_node
   notify: restart uwsgi
 
 - name: Configure audit log rotation cronjob
