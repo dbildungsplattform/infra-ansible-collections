@@ -1,5 +1,5 @@
 # See https://docs.bigbluebutton.org/dev/api.html#usage for BBB request signing with the API token
-bbb_liveness_probe_parameters: name=Liveness+check+meeting&meetingID=livenesscheck&attendeePW=ap&moderatorPW=mp&meta_bbb-origin-server-name=liveness-probe
+bbb_liveness_probe_parameters: name=Liveness%2Bcheck%2Bmeeting&meetingID=livenesscheck&attendeePW=ap&moderatorPW=mp&meta_bbb-origin-server-name=liveness-probe
 bbb_liveness_probe_create:
   name: "{{ bbb_instance_name }}-liveness-probe-create"
   # interval: 15s
