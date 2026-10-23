@@ -13,7 +13,9 @@
 
 - name: "Set scalelite_postgres_current_datadir_major"
   ansible.builtin.set_fact:
-    scalelite_postgres_current_datadir_major: "{{ scalelite_postgres_version_file.stat.exists | ternary((scalelite_postgres_version_file_content['content'] | b64decode | trim | int), 0) }}"
+    scalelite_postgres_current_datadir_major: "{{ scalelite_postgres_version_file_content['content'] | b64decode | trim | int }}"
+  when:
+    - "scalelite_postgres_version_file.stat.exists"
 
 - name: "Check if downgrade is planned"
   ansible.builtin.fail:
