@@ -31,7 +31,7 @@
 # The 'pi-manage create_tables' command only creates new database tables if they do not already exist
 # It will not modify or overwrite any existing tables.
 - name: Create database tables
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage setup create_tables --no-stamp"
   when: is_main_node
 
 - name: Ensure database schema is up to date
