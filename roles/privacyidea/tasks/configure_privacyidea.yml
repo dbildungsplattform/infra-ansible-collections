@@ -31,13 +31,12 @@
 # The 'pi-manage create_tables' command only creates new database tables if they do not already exist
 # It will not modify or overwrite any existing tables.
 - name: Create database tables
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage setup create_tables --no-stamp"
 
 - name: Ensure database schema is up to date
   command: "{{ privacyidea_dir }}/virtualenv/bin/privacyidea-schema-upgrade -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
   environment:
     PATH: "{{ privacyidea_dir }}/virtualenv/bin:{{ ansible_env.PATH }}"
-  when: install_privacyidea_result is changed
   notify: restart uwsgi
 
 - name: Configure audit log rotation cronjob
