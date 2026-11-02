@@ -5,7 +5,8 @@ server_name: ""
 uwsgi_config_name: "production" # Valid options:development,testing,production
 uwsgi_debug_mode: "False" # Valid options:True, False
 
-privacyidea_version: "3.8.1"
+privacyidea_version: "3.13.3"
+privacyidea_sha256_hash: "d36b9f296523b755721422d5edbe69672ec1e9263979681ba10164232ef27a14"
 privacyidea_packages:
     - python3-venv
     - python3-pip
@@ -63,3 +64,6 @@ desired_token_count: 37986
 #sql_resolver_service: "service"
 #sql_resolver_ucs_users: "ucs_users"
 #sql_resolver_ucs_domain_admins: "ucs_domain_admins"
+
+privacyidea_audit_rotate_days: 30
+privacyidea_audit_chunksize: 1000
