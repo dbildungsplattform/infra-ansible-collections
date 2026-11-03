@@ -1,3 +1,17 @@
+- name: Delete deprecated Kyverno RoleBinding ClusterPolicy (replaced by GeneratingPolicy below)
+  loop: "{{ permissions | dict2items | subelements('value.kubernetes', skip_missing=True) }}"
+  kubernetes.core.k8s:
+    state: absent
+    api_version: kyverno.io/v1
+    kind: ClusterPolicy
+    name: "add-{{ item.0.key | regex_replace('_', '-') }}-{{ item.1.role }}-rolebinding"
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+  when:
+    - inventory_hostname in (lookup('inventory_hostnames', item.1.hosts) | default('', true)).split(',')
+    - item.1.namespaces | default([]) | length > 0
+
 - name: Create Kyverno RoleBinding GeneratingPolicy
   loop: "{{ permissions | dict2items | subelements('value.kubernetes', skip_missing=True) }}"
   kubernetes.core.k8s:
