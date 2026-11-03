@@ -47,8 +47,8 @@ permissions:
     kubernetes:
       - hosts: "cluster-a"
         role: "cluster-reader"
-        namespaces: ["default", "app"]        # Optional — triggers Kyverno ClusterPolicy
-        namespace_excludes: ["kube-system"]    # Optional
+        namespaces: "^(default|app)$"         # Optional — triggers Kyverno GeneratingPolicy
+        namespace_excludes: "^kube-system$"   # Optional
 ```
 
 ### `present_users`
