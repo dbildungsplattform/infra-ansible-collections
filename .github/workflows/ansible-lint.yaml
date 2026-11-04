@@ -1,0 +1,35 @@
+name: ansible-lint
+on:
+  push:
+    branches:
+      - "**"
+
+env:
+  ANSIBLE_LINT_SARIF_FILE: "ansible-lint-results.sarif"
+
+jobs:
+  lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read           # Required by upload-sarif action
+      contents: read          # Required to checkout and read repo files
+      security-events: write  # Required to upload SARIF files to Security tab
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@665d9e07a1943254d2910faffc106adaf7ea7294 # v26.8.0
+        with:
+          setup_python: "true"
+          python_version: "3.14"
+          # requirements_file: "./collections/requirements.yml"
+          working_directory: "roles/generate_kubeconfigs"
+          args: "--sarif-file ${{ env.ANSIBLE_LINT_SARIF_FILE }} --exclude .ansible"
+      - name: upload ansible-lint results
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          sarif_file: "${{ env.ANSIBLE_LINT_SARIF_FILE }}"
