@@ -8,3 +8,8 @@ scalelite_host: "{{ bbb_domain_name }}"
 bbb_scrape_interval: 30s
 bbb_blackbox_exporter_module: liveness_probe_bbb
 # Only monitor the BBB servers but not Scalelite or TURN
+
+
+# greenlight monitoring
+scalelite_greenlight_enabled: false
+scalelite_greenlight_extra_instances: []
