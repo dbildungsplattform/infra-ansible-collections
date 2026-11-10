@@ -53,7 +53,7 @@
 
 - name: Create Greenlight Probe
   kubernetes.core.k8s:
-    state: "{{ scalelite_greenlight_enabled | ternary('present', 'absent') }}"
+    state: "{{ bbb_liveness_probe_greenlight_enabled | ternary('present', 'absent') }}"
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url | default(omit, true) }}"
     proxy_headers: "{{ proxy_headers | default(omit, true) }}"
