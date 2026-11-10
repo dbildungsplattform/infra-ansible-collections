@@ -17,10 +17,6 @@ bbb_liveness_probe_end:
     {{ ('end' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"
 
 bbb_liveness_probe_greenlight_urls: "{{
-  ['https://' ~ scalelite_host ~ '/greenlight/']
-  + (greenlight_extra_instances
-      | default([])
-      | map(attribute='hostname')
-      | map('regex_replace', '^(.*)$', 'https://\\1/')
-      | list)
+  ['https://' ~ scalelite_host ~ '/greenlight/'] +
+  bbb_liveness_probe_greenlight_extra_instances
   }}"

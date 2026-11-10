@@ -9,7 +9,5 @@ bbb_scrape_interval: 30s
 bbb_blackbox_exporter_module: liveness_probe_bbb
 # Only monitor the BBB servers but not Scalelite or TURN
 
-
-# greenlight monitoring
-scalelite_greenlight_enabled: true
-scalelite_greenlight_extra_instances: []
+bbb_liveness_probe_greenlight_enabled: true
+bbb_liveness_probe_greenlight_extra_instances: []
