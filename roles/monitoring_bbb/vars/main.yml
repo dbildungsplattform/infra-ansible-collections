@@ -232,30 +232,6 @@ bbb_prometheus_bbb_blackbox_exporter_job:
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
-bbb_prometheus_greenlight_urls: "{{
-  ['https://' ~ scalelite_host ~ '/greenlight/']
-  + (greenlight_extra_instances
-     | map(attribute='hostname')
-     | map('regex_replace', '^(.*)$', 'https://\\1/')
-     | list)
-  }}"
-bbb_prometheus_bbb_greenlight_blackbox_exporter_job:
-  job_name: "{{ bbb_instance_name }}-greenlight-blackbox-exporter"
-  metrics_path: /probe
-  params:
-    module: ["http_2xx"]
-  static_configs:
-    - targets: "{{ bbb_prometheus_greenlight_urls }}"
-  relabel_configs:
-    - source_labels: [__param_target]
-      target_label: "instance"
-    - target_label: "__address__"
-      replacement: "{{ bbb_blackbox_exporter_url | default('prometheus-blackbox-exporter:9115') }}"
-    - target_label: "tenant"
-      replacement: "{{ tenant }}"
-  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
-  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
-
 bbb_prometheus_turn_coturn_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-coturn-exporter"
   scheme: https
@@ -288,18 +264,11 @@ bbb_prometheus_turn_node_exporter_job:
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 
-bbb_prometheus_scrape_config: "{{
-    bbb_prometheus_servers_only_scrape_config +
-    (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) +
-    ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) +
-    ([bbb_prometheus_turn_coturn_cadvisor_job] if bbb_turn_server_cadvisor_enabled else []) +
-    ([bbb_prometheus_scalelite_cadvisor_job] if scalelite_cadvisor_enabled else []) +
-    ([bbb_prometheus_scalelite_postgresexporter_job] if scalelite_postgresexporter_enabled else []) +
-    ([bbb_prometheus_owasp_cadvisor_job, bbb_prometheus_owasp_node_exporter_job] if owasp_cadvisor_enabled else []) +
-    ([bbb_prometheus_freeswitch_node_exporter_job] if bbb_freeswitch_server_node_exporter_enabled else []) +
-    ([bbb_prometheus_freeswitch_cadvisor_job] if bbb_freeswitch_server_cadvisor_enabled else []) +
-    ([bbb_prometheus_bbb_greenlight_blackbox_exporter_job] if scalelite_greenlight_enabled else [])
-  }}"
+bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) +\
+ ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) + ([bbb_prometheus_turn_coturn_cadvisor_job] if bbb_turn_server_cadvisor_enabled else []) +\
+ ([bbb_prometheus_scalelite_cadvisor_job] if scalelite_cadvisor_enabled else []) + ([bbb_prometheus_scalelite_postgresexporter_job] if scalelite_postgresexporter_enabled else []) +\
+ ([bbb_prometheus_owasp_cadvisor_job, bbb_prometheus_owasp_node_exporter_job] if owasp_cadvisor_enabled else []) +\
+ ([bbb_prometheus_freeswitch_node_exporter_job] if bbb_freeswitch_server_node_exporter_enabled else []) + ([bbb_prometheus_freeswitch_cadvisor_job] if bbb_freeswitch_server_cadvisor_enabled else []) }}"
 
 bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"

@@ -42,7 +42,3 @@ prometheus_volumeMounts: []
 bbb_servers_only: false
 bbb_monitoring_scrape_interval: 10s
 bbb_monitoring_scrape_timeout: 5s
-
-# greenlight monitoring
-scalelite_greenlight_enabled: false
-scalelite_greenlight_extra_instances: []
