@@ -11,5 +11,5 @@ bbb_blackbox_exporter_module: liveness_probe_bbb
 
 
 # greenlight monitoring
-scalelite_greenlight_enabled: false
+scalelite_greenlight_enabled: true
 scalelite_greenlight_extra_instances: []
