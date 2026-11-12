@@ -91,7 +91,16 @@ services:
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
     tmpfs:
       - /tmp:rw,exec,mode=777
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
+    entrypoint: [
+      "/bin/sh", "-c",
+      "trap 'exit 0' TERM; while :; do \
+         echo \"$(date) - start renew\"; \
+         certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; \
+         echo \"$(date) - sleep start\"; \
+         sleep 43200; \
+         echo \"$(date) - sleep end\"; \
+       done"
+    ]
     environment:
 {% if scalelite_aws_access_key_id is defined %}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
