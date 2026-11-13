@@ -15,3 +15,8 @@ bbb_liveness_probe_end:
   # module: liveness_probe_bbb
   url: "https://{{ scalelite_host }}/bigbluebutton/api/end?{{ bbb_liveness_probe_parameters }}&checksum=\
     {{ ('end' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"
+
+bbb_liveness_probe_greenlight_urls: "{{
+  ['https://' ~ scalelite_host ~ '/greenlight/'] +
+  bbb_liveness_probe_greenlight_extra_instances
+  }}"
