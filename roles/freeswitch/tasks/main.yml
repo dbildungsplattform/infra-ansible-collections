@@ -30,7 +30,7 @@
           - libsndfile1
           - libavformat60
           - libldns3
-          - libswscale5
+          - libswscale7
           - libshout3
           - python3-lxml
           - fail2ban
