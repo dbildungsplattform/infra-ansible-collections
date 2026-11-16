@@ -28,7 +28,7 @@
           - libpq5
           - liblua5.1-0
           - libsndfile1
-          - libavformat58
+          - libavformat60
           - libldns3
           - libswscale5
           - libshout3
