@@ -35,7 +35,7 @@
           - python3-lxml
           - fail2ban
         update_cache: true
-      when: "ansible_lsb.major_release == '22'"
+      when: "ansible_lsb.major_release == '24'"
 
     - name: Create freeswitch group
       group:
