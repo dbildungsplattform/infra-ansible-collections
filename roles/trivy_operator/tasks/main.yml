@@ -29,4 +29,5 @@
     release_namespace: "{{ trivy_operator_release_namespace }}"
     wait: true
     values: "{{ trivy_values }}"
+    force: true
   tags: trivy

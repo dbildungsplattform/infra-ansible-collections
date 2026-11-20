@@ -15,6 +15,7 @@
     chart_version: "{{ maintenance_page_nginx_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ maintenance_namespace }}"
+    force: true
     values:
       serverBlock: |-
         server {

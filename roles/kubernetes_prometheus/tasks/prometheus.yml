@@ -32,7 +32,6 @@
     release_namespace: "{{ item.namespace }}"
     wait: true
     wait_timeout: 1200s
-    values:
-      "{{ prometheus_community_values }}"
+    values: "{{ prometheus_community_values }}"
+    force: true
   tags: prometheus
-

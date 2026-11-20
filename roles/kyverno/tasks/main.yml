@@ -16,6 +16,7 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ kyverno_namespace }}"
     values: "{{ kyverno_values }}"
+    force: true
 
 - name: Install namespace label policy
   kubernetes.core.k8s:

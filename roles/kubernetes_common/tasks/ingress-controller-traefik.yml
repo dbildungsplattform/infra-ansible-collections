@@ -7,5 +7,5 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: ingress-controller
     create_namespace: true
-    values:
-      "{{ ingress_traefik_chart_values }}"
+    values: "{{ ingress_traefik_chart_values }}"
+    force: true

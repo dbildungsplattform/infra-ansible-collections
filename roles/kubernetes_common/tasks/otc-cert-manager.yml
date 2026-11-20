@@ -29,8 +29,8 @@
     chart_version: "{{ otcdns_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: cert-manager
-    values:
-      "{{ otcdns_values }}"
+    values: "{{ otcdns_values }}"
+    force: true
   when: otc_cert_manager_enabled
 
 - name: Create wildcard certificates

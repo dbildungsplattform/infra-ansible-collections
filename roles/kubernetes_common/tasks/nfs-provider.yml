@@ -24,6 +24,7 @@
     release_namespace: nfs-provider
     create_namespace: true
     values: "{{ nfs_provider_values }}"
+    force: true
   when: nfs_server_ip is defined and nfs_provider_chart == "nfs-subdir"
 
 - name: Add csi-driver-nfs helm repo
@@ -45,4 +46,5 @@
     release_namespace: nfs-provider
     create_namespace: true
     values: "{{ nfs_provider_values }}"
+    force: true
   when: nfs_server_ip is defined and nfs_provider_chart == "csi-driver-nfs"

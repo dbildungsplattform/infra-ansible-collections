@@ -29,6 +29,7 @@
     kubeconfig: "{{ kubeconfig | default(omit) }}"
     state: "{{ item.state | default('present') }}"
     values: "{{ lookup('template', 'values.j2.yml') | from_yaml }}"
+    force: true
   loop_control:
     label: "{{ item.namespace }}/{{ item.release_name }}"
   loop: "{{ _gitlab_agent_instances_with_defaults }}"
