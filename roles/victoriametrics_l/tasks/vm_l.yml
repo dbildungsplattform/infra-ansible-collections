@@ -35,8 +35,8 @@
     chart_version: "{{ victoriametrics_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: monitoring
-    values:
-      "{{ victoriametrics_longterm_values }}"
+    values: "{{ victoriametrics_longterm_values }}"
+    force: true
   when: victoriametrics_longterm_enabled
   tags:
   - victoriametrics-l

@@ -18,8 +18,8 @@
     chart_version: "{{ loki_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: monitoring
-    values:
-      "{{ loki_values }}"
+    values: "{{ loki_values }}"
+    force: true
   tags: loki
   when: loki_s3_enabled
 

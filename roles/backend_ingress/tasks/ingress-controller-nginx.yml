@@ -5,7 +5,7 @@
       repo_url: "https://kubernetes.github.io/ingress-nginx"
     check_mode: false
     changed_when: false
-    tags: 
+    tags:
       - ingress-controller
 
   - name: Install Nginx Ingress Controller for Backend
@@ -18,7 +18,7 @@
       release_namespace: ingress-controller
       wait: true
       wait_timeout: 10m
-      values:
-        "{{ backend_ingress_values }}"
-    tags: 
+      values: "{{ backend_ingress_values }}"
+      force: true
+    tags:
     - ingress-controller

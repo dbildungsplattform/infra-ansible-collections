@@ -90,8 +90,8 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ awx_namespace }}"
     wait: true
-    values:
-      "{{ awx_operator_values }}"
+    values: "{{ awx_operator_values }}"
+    force: true
 
 - name: Install AWX
   kubernetes.core.k8s:

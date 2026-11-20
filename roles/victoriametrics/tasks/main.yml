@@ -54,5 +54,5 @@
     chart_version: "{{ victoriametrics_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: monitoring
-    values:
-      "{{ victoriametrics_values }}"
+    values: "{{ victoriametrics_values }}"
+    force: true

@@ -41,8 +41,8 @@
     chart_version: "{{ metrics_server_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: kube-system
-    values:
-      "{{ metrics_server_values }}"
+    values: "{{ metrics_server_values }}"
+    force: true
 
 - name: Create vminsert-credentials secret
   kubernetes.core.k8s:

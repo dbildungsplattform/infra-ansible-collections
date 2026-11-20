@@ -32,6 +32,7 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ collabora_namespace }}"
     values: "{{ collabora_values }}"
+    force: true
 
 - name: Install collabora ingress to redirect metrics page so it cant be seen
   kubernetes.core.k8s:

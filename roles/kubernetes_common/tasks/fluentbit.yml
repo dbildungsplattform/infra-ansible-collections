@@ -33,8 +33,8 @@
     chart_version: "{{ fluentbit_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: kube-system
-    values:
-      "{{ fluentbit_values }}"
+    values: "{{ fluentbit_values }}"
+    force: true
 
 - name: Install Fluentbit (k8s events)
   kubernetes.core.helm:
@@ -45,8 +45,8 @@
     chart_version: "{{ fluentbit_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: kube-system
-    values:
-      "{{ fluentbit_k8sevents_values }}"
+    values: "{{ fluentbit_k8sevents_values }}"
+    force: true
   when: "fluentbit_k8sevents_values is defined"
 
 - name: Install Fluentbit (syslog VM)
@@ -59,6 +59,6 @@
     chart_version: "{{ fluentbit_chart_version }}"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: kube-system
-    values:
-      "{{ fluentbit_syslog_values }}"
+    values: "{{ fluentbit_syslog_values }}"
+    force: true
   when: syslog_vm_ip is defined

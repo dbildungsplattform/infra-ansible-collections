@@ -125,5 +125,5 @@
       chart_version: "{{ cronjob_s3_backup_chart_version }}"
       kubeconfig: "{{ kubeconfig }}"
       release_namespace: "{{ cronjob_namespace }}"
-      values:
-        "{{ cronjob_s3_backup_values }}"
+      values: "{{ cronjob_s3_backup_values }}"
+      force: true

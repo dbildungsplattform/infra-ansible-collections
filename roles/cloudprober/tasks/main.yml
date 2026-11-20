@@ -21,6 +21,6 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ cloudprober_namespace }}"
     wait: true
-    values:
-      "{{ cloudprober_values }}"
+    values: "{{ cloudprober_values }}"
+    force: true
   tags: cloudprober

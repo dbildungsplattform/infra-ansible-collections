@@ -35,8 +35,8 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: cert-manager
     create_namespace: true
-    values:
-      "{{ cert_manager_chart_values }}"
+    values: "{{ cert_manager_chart_values }}"
+    force: true
 
 - name: Add public dbildungsplattform chart repo
   kubernetes.core.helm_repository:
@@ -57,4 +57,5 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: cert-manager
     values: "{{ cert_manager_clusterissuer_values }}"
+    force: true
   when: cert_manager_clusterissuer_enabled is true

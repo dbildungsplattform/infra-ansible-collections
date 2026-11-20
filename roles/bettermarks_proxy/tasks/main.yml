@@ -15,5 +15,6 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ bettermarks_namespace }}"
     values: "{{ instance_specific_chart_values | ansible.builtin.combine(bettermarks_proxy_chart_values, recursive=true) }}"
+    force: true
   loop: "{{ bettermarks_proxy_enabled_instances }}"
   tags: bettermarksproxy

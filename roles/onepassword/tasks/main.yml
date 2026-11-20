@@ -76,5 +76,5 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ onepassword_connector_namespace }}"
     update_repo_cache: true
-    values:
-      "{{ onepassword_connector_values }}"
+    values: "{{ onepassword_connector_values }}"
+    force: true

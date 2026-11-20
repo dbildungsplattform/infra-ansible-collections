@@ -16,5 +16,5 @@
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: monitoring
     wait: true
-    values:
-      "{{ prometheus_blackbox_exporter_values }}"
+    values: "{{ prometheus_blackbox_exporter_values }}"
+    force: true

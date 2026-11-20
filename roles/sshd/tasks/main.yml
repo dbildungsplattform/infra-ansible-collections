@@ -94,5 +94,6 @@
         release_namespace: "{{ sshd_namespace }}"
         values: "{{ sshd_values }}"
         wait: true
+        force: true
       tags:
         - sshd
