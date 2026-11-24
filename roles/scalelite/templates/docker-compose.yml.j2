@@ -288,6 +288,7 @@ services:
       - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-greenlight:6379
       - CLAMAV_SCANNING={{ scalelite_clamav_enabled | string | lower }}
       - CLAMAV_DAEMONIZE=true
+      - URL_HOST={{ scalelite_host }}
 {% if scalelite_greenlight_phone_number | length > 0 %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
 {% endif %}
@@ -355,6 +356,7 @@ services:
       - REDIS_URL=redis://${GREENLIGHT_REDIS_{{ instance.name | upper | replace('-', '_') }}_USER}:${GREENLIGHT_REDIS_{{ instance.name | upper | replace('-', '_') }}_SECRET}@redis-{{ instance.name}}:6379
       - CLAMAV_SCANNING={{ scalelite_clamav_enabled | string | lower }}
       - CLAMAV_DAEMONIZE=true
+      - URL_HOST={{ instance.hostname }}
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
 {% endif %}
