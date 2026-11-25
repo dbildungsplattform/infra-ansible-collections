@@ -50,3 +50,25 @@
     - "{{ bbb_liveness_probe_end }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Create Greenlight Probe
+  kubernetes.core.k8s:
+    state: "{{ bbb_liveness_probe_greenlight_enabled | ternary('present', 'absent') }}"
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: Probe
+      metadata:
+        name: "{{ bbb_instance_name }}-greenlight-blackbox-exporter"
+        namespace: monitoring
+      spec:
+        jobName: "{{ bbb_instance_name }}-greenlight-blackbox-exporter"
+        prober:
+          url: "{{ bbb_blackbox_exporter_url }}"
+        module: "{{ bbb_blackbox_exporter_module_http_2xx | default('http_2xx') }}"
+        interval: "{{ bbb_scrape_interval }}"
+        targets:
+          staticConfig:
+            static: "{{ bbb_liveness_probe_greenlight_urls }}"
