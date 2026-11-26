@@ -1,19 +1,34 @@
-generate_kubeconfigs_kubeconfig: "{{ kubeconfig }}"
-generate_kubeconfigs_kubeconfigs_vault: "{{ kubeconfigs_vault }}"
+---
+# Path of the admin kubeconfig used to talk to the cluster
+generate_kubeconfigs_kubeconfig: "{{ kubeconfig | default('') }}"
+# Name of the cluster, used as file name of the generated kubeconfig
+generate_kubeconfigs_cluster_name: "{{ cluster_name | default('') }}"
 
-generate_kubeconfigs_proxy_vault: "{{ proxy_vault }}"
-generate_kubeconfigs_proxy_url: "{{ proxy_url }}"
-generate_kubeconfigs_proxy_headers: "{{ proxy_headers }}"
-generate_kubeconfigs_proxy_user_awx: "awx"
-generate_kubeconfigs_proxy_pass_awx: |-
-      {{ lookup('dbildungscloud.onepwd.onepwd',
-            secret_name='awx',
-            vault=generate_kubeconfigs_proxy_vault,
-            session_shorthand='ansible-run',
-            credentials=op_credentials) }}
+# Users (dicts with name, personal, permissions.kubernetes, ...)
+generate_kubeconfigs_present_users: "{{ present_users | default([]) }}"
+generate_kubeconfigs_absent_users: "{{ absent_users | default([]) }}"
+# Names of users whose service account token should be regenerated
+generate_kubeconfigs_regenerate_users: "{{ regenerate_users | default([]) }}"
 
-generate_kubeconfigs_present_users: "{{ present_users }}"
-generate_kubeconfigs_absent_users: "{{ absent_users }}"
-generate_kubeconfigs_regenerate_users: "{{ regenerate_users }}"
+# ClusterRoles to create, list of dicts with name, hosts, rules and optional labels
+generate_kubeconfigs_kubernetes_roles: "{{ kubernetes_roles | default([]) }}"
+# Rules of the ClusterRole, only used if _create_clusterrole is true in serviceaccounts.yml
+generate_kubeconfigs_serviceaccount_rules: "{{ serviceaccount_rules | default([]) }}"
 
-generate_kubeconfigs_cluster_name: "{{ cluster_name }}"
+# Proxy used to reach the cluster API and written into the generated kubeconfigs
+generate_kubeconfigs_proxy_url: "{{ proxy_url | default('') }}"
+generate_kubeconfigs_proxy_headers: "{{ proxy_headers | default('') }}"
+generate_kubeconfigs_proxy_domain: "{{ proxy_domain | default('') }}"
+generate_kubeconfigs_proxy_port: "{{ proxy_port | default('') }}"
+generate_kubeconfigs_ignore_proxy: "{{ ignore_proxy | default(false) }}"
+# User used to fetch the admin kubeconfig on AWX
+generate_kubeconfigs_proxy_user_awx: awx
+
+# 1Password
+generate_kubeconfigs_op_service_account_token: "{{ (op_credentials | default({})).OP_SERVICE_ACCOUNT_TOKEN | default('') }}"
+generate_kubeconfigs_proxy_vault: "{{ proxy_vault | default('') }}"
+generate_kubeconfigs_kubeconfigs_vault: "{{ kubeconfigs_vault | default('') }}"
+generate_kubeconfigs_infra_vault: "{{ infra_vault | default('') }}"
+
+# Directory containing the SSH public keys (<user>.pub) used to encrypt personal kubeconfigs
+generate_kubeconfigs_sshkeys_dir: "{{ playbook_dir }}/files/sshkeys"

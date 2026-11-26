@@ -1,0 +1,85 @@
+---
+argument_specs:
+  main:
+    short_description: Generate personalized Kubernetes kubeconfigs
+    description:
+      - Creates ServiceAccounts, (Cluster)RoleBindings and token based kubeconfigs for users and uploads them to 1Password.
+      - Removes the resources and 1Password items of absent users.
+    options:
+      generate_kubeconfigs_kubeconfig:
+        type: path
+        required: true
+        description: Admin kubeconfig used to access the cluster.
+      generate_kubeconfigs_cluster_name:
+        type: str
+        required: true
+        description: Cluster name, used as file name of the generated kubeconfig.
+      generate_kubeconfigs_present_users:
+        type: list
+        elements: dict
+        default: []
+        description: Users that get kubeconfigs (keys name, personal, permissions.kubernetes, optional serviceaccount_name).
+      generate_kubeconfigs_absent_users:
+        type: list
+        elements: dict
+        default: []
+        description: Users whose resources and 1Password items are removed.
+      generate_kubeconfigs_regenerate_users:
+        type: list
+        elements: str
+        default: []
+        description: Names of users whose token is regenerated.
+      generate_kubeconfigs_kubernetes_roles:
+        type: list
+        elements: dict
+        default: []
+        description: ClusterRoles to create (keys name, hosts, rules, optional labels).
+      generate_kubeconfigs_serviceaccount_rules:
+        type: list
+        elements: dict
+        default: []
+        description: Rules for a ClusterRole created from serviceaccounts.yml.
+      generate_kubeconfigs_proxy_url:
+        type: str
+        default: ""
+        description: Proxy used for Kubernetes API calls.
+      generate_kubeconfigs_proxy_headers:
+        type: raw
+        default: ""
+        description: Headers sent to the proxy.
+      generate_kubeconfigs_proxy_domain:
+        type: str
+        default: ""
+        description: Proxy domain written into the kubeconfigs, empty for no proxy.
+      generate_kubeconfigs_proxy_port:
+        type: raw
+        default: ""
+        description: Proxy port written into the kubeconfigs.
+      generate_kubeconfigs_ignore_proxy:
+        type: bool
+        default: false
+        description: Passed to get_ionos_kubeconfig (AWX only).
+      generate_kubeconfigs_proxy_user_awx:
+        type: str
+        default: awx
+        description: Proxy user for fetching the admin kubeconfig on AWX.
+      generate_kubeconfigs_op_service_account_token:
+        type: str
+        required: true
+        no_log: true
+        description: 1Password service account token.
+      generate_kubeconfigs_proxy_vault:
+        type: str
+        default: ""
+        description: 1Password vault with the proxy passwords.
+      generate_kubeconfigs_kubeconfigs_vault:
+        type: str
+        required: true
+        description: 1Password vault where personal kubeconfigs are stored.
+      generate_kubeconfigs_infra_vault:
+        type: str
+        default: ""
+        description: 1Password vault where non-personal kubeconfigs are stored.
+      generate_kubeconfigs_sshkeys_dir:
+        type: path
+        description: Directory with the SSH public keys (<user>.pub), defaults to <playbook_dir>/files/sshkeys.
