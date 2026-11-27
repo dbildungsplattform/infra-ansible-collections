@@ -178,10 +178,8 @@ scalelite_rails_max_threads: 4
 scalelite_log_level: warn
 scalelite_multitenancy_enabled: true
 
-# scalelite_poller_image: blindsidenetwks/scalelite:v1.8.1-jammy300-alpine-poller@sha256:0b6a94a880fe584c5230c1caf0f582c42f9068da4b9ad3496cfe4cc05d2a7f94
-scalelite_poller_image: ghcr.io/dbildungsplattform/scalelite@sha256:27ce6bde4138e288e4fe2c3714c151118159733584c825c507a0959fb0093900
-# scalelite_api_image: blindsidenetwks/scalelite:v1.8.1-jammy300-alpine-api@sha256:8155cbda34057b84e431bb4595e48624a147a0fed546b1f180191cc50969b741
-scalelite_api_image: ghcr.io/dbildungsplattform/scalelite@sha256:27ce6bde4138e288e4fe2c3714c151118159733584c825c507a0959fb0093900
+scalelite_poller_image: blindsidenetwks/scalelite:v1.9.0.1-poller@sha256:ef45311ed77015be25325a414f297b548fb0aa8dca2d588f46c51ed065b8011b
+scalelite_api_image: blindsidenetwks/scalelite:v1.9.0.1-api@sha256:097ac1cb88ad6e6f1cb8314a49e397f3b680cc2a9637082d72a1b0a780a66cf8
 
 # scalelite_secret_key_base:
 # scalelite_api_key
