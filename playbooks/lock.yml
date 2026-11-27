@@ -1,0 +1,20 @@
+---
+# Acquire the rollout lock: -e before_rollout_checks_lock_comment="..." -e before_rollout_checks_lock_approx_until=2026-01-01T12:00Z
+- name: Acquire rollout lock
+  hosts: stages
+  gather_facts: false
+  pre_tasks:
+    - name: Load vault secrets in case of local rollout
+      ansible.builtin.include_vars:
+        file: /localhome/ansible_vault_secrets.yml
+      when: "'/localhome/ansible_vault_secrets.yml' is file"
+      tags: always
+  tasks:
+    - name: Check lock and acquire it
+      ansible.builtin.include_role:
+        name: before_rollout_checks
+      vars:
+        before_rollout_checks_stale_enabled: false
+        before_rollout_checks_scope_enabled: false
+        before_rollout_checks_lock_enabled: true
+        before_rollout_checks_lock_acquire: true

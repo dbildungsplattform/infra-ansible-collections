@@ -1,0 +1,19 @@
+---
+- name: Read the lock
+  ansible.builtin.include_tasks: lock_read.yml
+
+- name: Fail if the rollout is locked by someone else
+  ansible.builtin.fail:
+    msg: >-
+      Rollout is locked by {{ before_rollout_checks_lock.locked_by }}
+      since {{ before_rollout_checks_lock.locked_since }}
+      (approx. until: {{ before_rollout_checks_lock.locked_approx_until | default('') }},
+      comment: {{ before_rollout_checks_lock.comment | default('') }}).
+  when:
+    - before_rollout_checks_lock_exists
+    - before_rollout_checks_lock.locked_by != before_rollout_checks_user
+
+- name: Report lock held by ourselves
+  ansible.builtin.debug:
+    msg: "Lock is already held by {{ before_rollout_checks_user }}."
+  when: before_rollout_checks_lock_exists

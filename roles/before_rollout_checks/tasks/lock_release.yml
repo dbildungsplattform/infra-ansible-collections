@@ -1,0 +1,37 @@
+---
+- name: Read the lock
+  ansible.builtin.include_tasks: lock_read.yml
+
+- name: Nothing to release
+  ansible.builtin.debug:
+    msg: "No lock present."
+  when: not before_rollout_checks_lock_exists
+
+- name: Release the lock
+  when: before_rollout_checks_lock_exists
+  vars:
+    _bro_is_owner: "{{ before_rollout_checks_lock.locked_by == before_rollout_checks_user }}"
+    _bro_forced: "{{ before_rollout_checks_lock_force | bool }}"
+  block:
+    - name: Fail if the lock belongs to someone else and release is not forced
+      ansible.builtin.fail:
+        msg: |-
+          Can't release the lock, it was acquired by {{ before_rollout_checks_lock.locked_by }}.
+          To force: -e before_rollout_checks_lock_force=true
+      when: not (_bro_is_owner | bool) and not (_bro_forced | bool)
+
+    - name: Log forced release
+      ansible.builtin.debug:
+        msg: "{{ before_rollout_checks_user }} forces release of lock held by {{ before_rollout_checks_lock.locked_by }}."
+      when: not (_bro_is_owner | bool)
+
+    - name: Delete the lock
+      amazon.aws.s3_object:
+        endpoint_url: "{{ before_rollout_checks_s3_endpoint_url }}"
+        access_key: "{{ before_rollout_checks_s3_access_key }}"
+        secret_key: "{{ before_rollout_checks_s3_secret_key }}"
+        bucket: "{{ before_rollout_checks_s3_bucket }}"
+        object: "{{ before_rollout_checks_lock_object }}"
+        mode: delobj
+      delegate_to: localhost
+      run_once: true

@@ -1,0 +1,37 @@
+---
+# Requires lock_check.yml to have run (sets before_rollout_checks_lock_exists)
+- name: Acquire a new lock
+  when: not before_rollout_checks_lock_exists
+  block:
+    - name: Build lock content
+      ansible.builtin.set_fact:
+        _before_rollout_checks_lock_content:
+          locked_since: "{{ now(utc=true, fmt='%Y-%m-%dT%H:%M:%SZ') }}"
+          locked_by: "{{ before_rollout_checks_user }}"
+          locked_approx_until: "{{ before_rollout_checks_lock_approx_until }}"
+          comment: "{{ before_rollout_checks_lock_comment }}"
+
+    - name: Write the lock (never overwrite)
+      amazon.aws.s3_object:
+        endpoint_url: "{{ before_rollout_checks_s3_endpoint_url }}"
+        access_key: "{{ before_rollout_checks_s3_access_key }}"
+        secret_key: "{{ before_rollout_checks_s3_secret_key }}"
+        bucket: "{{ before_rollout_checks_s3_bucket }}"
+        object: "{{ before_rollout_checks_lock_object }}"
+        mode: put
+        overwrite: never
+        content: "{{ _before_rollout_checks_lock_content | to_nice_json }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Re-read the lock
+      ansible.builtin.include_tasks: lock_read.yml
+
+    - name: Make sure we actually own the lock
+      ansible.builtin.fail:
+        msg: "Lock was acquired concurrently by {{ before_rollout_checks_lock.locked_by | default('unknown') }}."
+      when: before_rollout_checks_lock != _before_rollout_checks_lock_content
+
+    - name: Report
+      ansible.builtin.debug:
+        msg: "Successfully acquired new lock."
