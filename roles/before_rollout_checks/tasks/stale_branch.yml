@@ -1,0 +1,89 @@
+---
+# On AWX the project dir has no .git; awx_project_revision holds the checked-out SHA,
+# which we compare against a temporary bare clone of the remote.
+# Locally the working copy is used.
+- name: Verify that the current revision is not behind the remote branch
+  vars:
+    _bro_awx: "{{ awx_project_revision is defined }}"
+    _bro_range: >-
+      {{ (awx_project_revision ~ '...' ~ before_rollout_checks_remote_branch) if _bro_awx | bool
+      else ('HEAD...' ~ before_rollout_checks_remote_name ~ '/' ~ before_rollout_checks_remote_branch) }}
+  block:
+    - name: Fail if no repo URL is configured on AWX
+      ansible.builtin.assert:
+        that: before_rollout_checks_repo_url | length > 0
+        fail_msg: "before_rollout_checks_repo_url must be set when running on AWX."
+      when: _bro_awx | bool
+
+    - name: Create temporary directory for the bare clone
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: rollout-check-
+      register: _before_rollout_checks_tmp
+      delegate_to: localhost
+      run_once: true
+      when: _bro_awx | bool
+
+    - name: Clone remote branch (bare, blobless)
+      # noqa: command-instead-of-module
+      ansible.builtin.command:
+        argv:
+          - git
+          - clone
+          - --bare
+          - --filter=blob:none
+          - --single-branch
+          - --branch
+          - "{{ before_rollout_checks_remote_branch }}"
+          - "{{ before_rollout_checks_repo_url }}"
+          - "{{ _before_rollout_checks_tmp.path }}"
+      changed_when: false
+      delegate_to: localhost
+      run_once: true
+      no_log: true
+      when: _bro_awx | bool
+
+    - name: Fetch the latest refs from the remote (local run)
+      # noqa: command-instead-of-module
+      ansible.builtin.command:
+        argv: [git, fetch, "{{ before_rollout_checks_remote_name }}"]
+        chdir: "{{ playbook_dir }}"
+      changed_when: false
+      delegate_to: localhost
+      run_once: true
+      when: not (_bro_awx | bool)
+
+    - name: Get ahead/behind counts
+      # noqa: command-instead-of-module
+      ansible.builtin.command:
+        argv:
+          - git
+          - "{{ ('--git-dir=' ~ _before_rollout_checks_tmp.path) if _bro_awx | bool else '--no-pager' }}"
+          - rev-list
+          - --left-right
+          - --count
+          - "{{ _bro_range }}"
+        chdir: "{{ playbook_dir }}"
+      register: _before_rollout_checks_revlist
+      changed_when: false
+      delegate_to: localhost
+      run_once: true
+
+    - name: Parse the rev-list output
+      ansible.builtin.set_fact:
+        _before_rollout_checks_ahead_behind: "{{ _before_rollout_checks_revlist.stdout.split() | map('int') | list }}"
+
+    - name: Fail if the branch is behind
+      ansible.builtin.fail:
+        msg: >-
+          Branch is behind {{ before_rollout_checks_remote_branch }}
+          ({{ _before_rollout_checks_ahead_behind[0] }} ahead, {{ _before_rollout_checks_ahead_behind[1] }} behind).
+      when: _before_rollout_checks_ahead_behind[1] != 0
+  always:
+    - name: Remove temporary clone
+      ansible.builtin.file:
+        path: "{{ _before_rollout_checks_tmp.path }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      when: _before_rollout_checks_tmp.path is defined

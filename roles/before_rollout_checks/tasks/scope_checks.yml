@@ -1,0 +1,46 @@
+---
+- name: Terminate local run in non check mode to non dev instances
+  ansible.builtin.assert:
+    that:
+      - ansible_check_mode
+    fail_msg: >
+      Local rollouts to non dev instances that are not in check mode are not allowed.
+      Use check mode or when in emergency, force the rollout by adding
+      -e "{force_local_rollout: True}".
+  when:
+    - awx_job_id is not defined
+    - group_names | intersect(before_rollout_checks_local_allowed_groups) | length == 0
+    - not before_rollout_checks_force_local_rollout | bool
+
+- name: Check that OP_SERVICE_ACCOUNT_TOKEN is defined
+  ansible.builtin.assert:
+    that: "OP_SERVICE_ACCOUNT_TOKEN | default('') | length > 0"
+    fail_msg: "OP_SERVICE_ACCOUNT_TOKEN must be defined. Please set one in your ansible vault."
+  when: before_rollout_checks_op_token_required | bool
+
+- name: Check that every host has the project and stage variables
+  ansible.builtin.assert:
+    that:
+      - project is defined
+      - stage is defined
+    fail_msg: "Host {{ inventory_hostname }} must define the variables 'project' (project name) and 'stage'."
+
+- name: Check that only one stage is selected
+  vars:
+    _bro_stages: "{{ ansible_play_hosts_all | map('extract', hostvars, 'stage') | list | unique }}"
+  # noqa: run-once[task]
+  run_once: true
+  ansible.builtin.assert:
+    that:
+      - _bro_stages | length == 1
+    fail_msg: "Only single stage rollout allowed (selected: {{ _bro_stages | join(', ') }})"
+
+- name: Check that only one project is selected
+  vars:
+    _bro_projects: "{{ ansible_play_hosts_all | map('extract', hostvars, 'project') | list | unique }}"
+  # noqa: run-once[task]
+  run_once: true
+  ansible.builtin.assert:
+    that:
+      - _bro_projects | length == 1
+    fail_msg: "Only single project rollout allowed (selected: {{ _bro_projects | join(', ') }})"

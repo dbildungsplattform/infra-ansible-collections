@@ -1,0 +1,27 @@
+---
+# Sets before_rollout_checks_lock (dict) if a lock exists, else before_rollout_checks_lock_exists=false
+- name: Read the lock file
+  amazon.aws.s3_object:
+    endpoint_url: "{{ before_rollout_checks_s3_endpoint_url }}"
+    access_key: "{{ before_rollout_checks_s3_access_key }}"
+    secret_key: "{{ before_rollout_checks_s3_secret_key }}"
+    bucket: "{{ before_rollout_checks_s3_bucket }}"
+    object: "{{ before_rollout_checks_lock_object }}"
+    mode: getstr
+  register: _before_rollout_checks_lock_read
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+  run_once: true
+
+- name: Fail on unexpected S3 errors
+  ansible.builtin.fail:
+    msg: "Unexpected error when reading the lock: {{ _before_rollout_checks_lock_read.msg | default(_before_rollout_checks_lock_read) }}"
+  when:
+    - _before_rollout_checks_lock_read.contents is not defined
+    - "'does not exist' not in (_before_rollout_checks_lock_read.msg | default(''))"
+
+- name: Set lock facts
+  ansible.builtin.set_fact:
+    before_rollout_checks_lock_exists: "{{ _before_rollout_checks_lock_read.contents is defined }}"
+    before_rollout_checks_lock: "{{ (_before_rollout_checks_lock_read.contents | from_json) if _before_rollout_checks_lock_read.contents is defined else {} }}"
