@@ -1,0 +1,65 @@
+---
+# Binds the ServiceAccount to the ClusterRole in a single namespace (_rolebinding_namespace).
+# The ServiceAccount itself lives in _serviceaccount_namespace.
+- name: "Check if RoleBinding changed in namespace {{ _rolebinding_namespace }}"
+  check_mode: true
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ generate_kubeconfigs_kubeconfig }}"
+    proxy: "{{ generate_kubeconfigs_proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ generate_kubeconfigs_proxy_headers | default(omit, true) }}"
+    definition:
+      kind: RoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: "{{ _serviceaccount_name }}"
+        namespace: "{{ _rolebinding_namespace }}"
+      subjects:
+        - kind: ServiceAccount
+          name: "{{ _serviceaccount_name }}"
+          namespace: "{{ _serviceaccount_namespace }}"
+      roleRef:
+        kind: ClusterRole
+        name: "{{ _clusterrole_name }}"
+        apiGroup: rbac.authorization.k8s.io
+  register: _rolebinding_check
+  ignore_errors: true
+  tags: serviceaccount
+
+- name: "Delete RoleBinding to recreate it in namespace {{ _rolebinding_namespace }}"
+  kubernetes.core.k8s:
+    state: absent
+    kubeconfig: "{{ generate_kubeconfigs_kubeconfig }}"
+    proxy: "{{ generate_kubeconfigs_proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ generate_kubeconfigs_proxy_headers | default(omit, true) }}"
+    definition:
+      kind: RoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: "{{ _serviceaccount_name }}"
+        namespace: "{{ _rolebinding_namespace }}"
+  when: _rolebinding_check is changed or _rolebinding_check is failed
+  tags: serviceaccount
+
+- name: "Create RoleBinding in namespace {{ _rolebinding_namespace }}"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ generate_kubeconfigs_kubeconfig }}"
+    proxy: "{{ generate_kubeconfigs_proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ generate_kubeconfigs_proxy_headers | default(omit, true) }}"
+    definition:
+      kind: RoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: "{{ _serviceaccount_name }}"
+        namespace: "{{ _rolebinding_namespace }}"
+      subjects:
+        - kind: ServiceAccount
+          name: "{{ _serviceaccount_name }}"
+          namespace: "{{ _serviceaccount_namespace }}"
+      roleRef:
+        kind: ClusterRole
+        name: "{{ _clusterrole_name }}"
+        apiGroup: rbac.authorization.k8s.io
+  when: _rolebinding_check is changed or _rolebinding_check is failed
+  tags: serviceaccount

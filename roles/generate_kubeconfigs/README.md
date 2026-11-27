@@ -22,6 +22,26 @@ See `defaults/main.yml` and `meta/argument_specs.yml`. Defaults fall back to the
 | `generate_kubeconfigs_proxy_vault`, `_infra_vault` | no | Further 1Password vaults |
 | `generate_kubeconfigs_sshkeys_dir` | no | Default `{{ playbook_dir }}/files/sshkeys` |
 
+## Permissions
+
+Each entry in `permissions.kubernetes` of a user needs `hosts` and `role` (a ClusterRole).
+`namespace` is optional and can be a string or a list:
+
+- not set: a `ClusterRoleBinding` is created (cluster-wide access)
+- `namespace: dev` or `namespace: [dev, test]`: a `RoleBinding` is created in every listed namespace.
+  The ServiceAccount (and its token) lives in the first namespace, so each user still gets one kubeconfig per cluster.
+
+```yaml
+permissions:
+  developer:
+    kubernetes:
+      - hosts: "stage-dev"
+        role: developer
+        namespace:
+          - dev
+          - test
+```
+
 ## Example
 
 ```yaml
