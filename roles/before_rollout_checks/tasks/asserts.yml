@@ -1,0 +1,137 @@
+---
+# Validates the types of all role inputs and that required values are set.
+# Which values are required depends on the enabled features, so the *_enabled
+# flags are validated first and then used to select the remaining checks.
+# Booleans may arrive as real booleans or as strings (-e x=true, AWX surveys).
+- name: Check that the feature flags are booleans
+  ansible.builtin.assert:
+    that:
+      - (item.value is boolean) or (item.value | string | lower in _bro_bool_strings)
+    fail_msg: "{{ item.name }} must be a boolean, got {{ item.value | type_debug }}: {{ item.value }}"
+    quiet: true
+  loop:
+    - {name: before_rollout_checks_scope_enabled, value: "{{ before_rollout_checks_scope_enabled }}"}
+    - {name: before_rollout_checks_stale_enabled, value: "{{ before_rollout_checks_stale_enabled }}"}
+    - {name: before_rollout_checks_lock_enabled, value: "{{ before_rollout_checks_lock_enabled }}"}
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    _bro_bool_strings: ["true", "false", "yes", "no"]
+
+- name: Check the optional boolean inputs
+  ansible.builtin.assert:
+    that:
+      - (item.value is boolean) or (item.value | string | lower in _bro_bool_strings)
+    fail_msg: "{{ item.name }} must be a boolean, got {{ item.value | type_debug }}: {{ item.value }}"
+    quiet: true
+  loop:
+    - {name: before_rollout_checks_force_local_rollout, value: "{{ before_rollout_checks_force_local_rollout }}"}
+    - {name: before_rollout_checks_op_token_required, value: "{{ before_rollout_checks_op_token_required }}"}
+    - {name: before_rollout_checks_lock_acquire, value: "{{ before_rollout_checks_lock_acquire }}"}
+    - {name: before_rollout_checks_lock_force, value: "{{ before_rollout_checks_lock_force }}"}
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    _bro_bool_strings: ["true", "false", "yes", "no"]
+
+- name: Check the optional string inputs
+  ansible.builtin.assert:
+    that: item.value is string
+    fail_msg: "{{ item.name }} must be a string, got {{ item.value | type_debug }}"
+    quiet: true
+  loop:
+    - {name: before_rollout_checks_lock_approx_until, value: "{{ before_rollout_checks_lock_approx_until }}"}
+    - {name: before_rollout_checks_lock_comment, value: "{{ before_rollout_checks_lock_comment }}"}
+    - {name: before_rollout_checks_repo_url, value: "{{ before_rollout_checks_repo_url }}"}
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Check the scope check inputs
+  when: before_rollout_checks_scope_enabled | bool
+  block:
+    - name: Check that the allowed groups are a list of strings
+      ansible.builtin.assert:
+        that:
+          - before_rollout_checks_local_allowed_groups is sequence
+          - before_rollout_checks_local_allowed_groups is not string
+          - before_rollout_checks_local_allowed_groups is not mapping
+          - before_rollout_checks_local_allowed_groups | select('string') | list | length == before_rollout_checks_local_allowed_groups | length
+        fail_msg: "before_rollout_checks_local_allowed_groups must be a list of strings."
+        quiet: true
+
+    - name: Check that project and stage are set on every host
+      ansible.builtin.assert:
+        that:
+          - project is defined
+          - project is string
+          - project | length > 0
+          - stage is defined
+          - stage is string
+          - stage | length > 0
+        fail_msg: "Host {{ inventory_hostname }} must define 'project' (project name) and 'stage' as non-empty strings."
+        quiet: true
+
+    - name: Check that the 1Password token is set
+      ansible.builtin.assert:
+        that:
+          - OP_SERVICE_ACCOUNT_TOKEN is defined
+          - OP_SERVICE_ACCOUNT_TOKEN is string
+          - OP_SERVICE_ACCOUNT_TOKEN | length > 0
+        fail_msg: "OP_SERVICE_ACCOUNT_TOKEN must be defined as a non-empty string. Please set one in your ansible vault."
+        quiet: true
+      when: before_rollout_checks_op_token_required | bool
+
+- name: Check the stale branch check inputs
+  when: before_rollout_checks_stale_enabled | bool
+  block:
+    - name: Check the remote name and branch
+      ansible.builtin.assert:
+        that:
+          - item.value is string
+          - item.value | length > 0
+        fail_msg: "{{ item.name }} must be a non-empty string, got {{ item.value | type_debug }}."
+        quiet: true
+      loop:
+        - {name: before_rollout_checks_remote_name, value: "{{ before_rollout_checks_remote_name }}"}
+        - {name: before_rollout_checks_remote_branch, value: "{{ before_rollout_checks_remote_branch }}"}
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Check that the repo URL is set on AWX
+      ansible.builtin.assert:
+        that: before_rollout_checks_repo_url | length > 0
+        fail_msg: "before_rollout_checks_repo_url must be set when running on AWX (the project dir has no .git)."
+        quiet: true
+      when: awx_project_revision is defined
+
+- name: Check the lock inputs
+  when: before_rollout_checks_lock_enabled | bool
+  block:
+    - name: Check that the lock inputs are non-empty strings
+      ansible.builtin.assert:
+        that:
+          - item.value is string
+          - item.value | length > 0
+        fail_msg: "{{ item.name }} must be a non-empty string (got {{ item.value | type_debug }})."
+        quiet: true
+      loop:
+        - {name: before_rollout_checks_s3_endpoint_url, value: "{{ before_rollout_checks_s3_endpoint_url }}"}
+        - {name: before_rollout_checks_s3_bucket, value: "{{ before_rollout_checks_s3_bucket }}"}
+        - {name: before_rollout_checks_lock_object, value: "{{ before_rollout_checks_lock_object }}"}
+        - {name: before_rollout_checks_user, value: "{{ before_rollout_checks_user }}"}
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Check that the S3 credentials are non-empty strings
+      ansible.builtin.assert:
+        that:
+          - item.value is string
+          - item.value | length > 0
+        fail_msg: "{{ item.name }} must be a non-empty string."
+        quiet: true
+      loop:
+        - {name: before_rollout_checks_s3_access_key, value: "{{ before_rollout_checks_s3_access_key }}"}
+        - {name: before_rollout_checks_s3_secret_key, value: "{{ before_rollout_checks_s3_secret_key }}"}
+      loop_control:
+        label: "{{ item.name }}"
+      no_log: true

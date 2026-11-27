@@ -1,4 +1,11 @@
 ---
+- name: Validate the role inputs
+  ansible.builtin.include_tasks:
+    file: asserts.yml
+    apply:
+      tags: always
+  tags: always
+
 - name: Check rollout scope (local guard, single stage, single project)
   ansible.builtin.include_tasks:
     file: scope_checks.yml
