@@ -92,7 +92,7 @@ Booleans may be real booleans or strings such as `true`/`false`/`yes`/`no` (as p
     - role: before_rollout_checks
       vars:
         before_rollout_checks_local_allowed_groups: [project_dev, project_infradev]
-        before_rollout_checks_repo_url: "https://{{ git_user }}:{{ git_token }}@github.com/org/repo.git"
+        before_rollout_checks_repo_url: "https://{{ before_rollout_checks_git_user }}:{{ before_rollout_checks_git_token }}@github.com/org/repo.git"
     - role: my_application
 ```
 
@@ -169,7 +169,7 @@ This repository contains ready-made versions: `playbook-lock.yml`, `playbook-unl
 ## Running the lock and unlock playbooks directly
 
 You can run the playbooks directly from this collection by FQCN,
-for example `ansible-playbook dbildungsplattform.infra-ansible-collections.lock`. The role is then referenced by its FQCN.
+for example `ansible-playbook dbildungscloud.infra.lock`. The role is then referenced by its FQCN.
 
 `playbook-lock.yml` and `playbook-unlock.yml` run on `localhost` and only talk to S3, so no inventory hosts are needed. They enable the lock themselves, so `before_rollout_checks_lock_enabled` doesn't have to be set.
 ### Prerequisites
@@ -179,28 +179,29 @@ for example `ansible-playbook dbildungsplattform.infra-ansible-collections.lock`
 - The `amazon.aws` collection and `boto3` are installed.
 ### Lock
 ```bash
-ansible-playbook dbildungsplattform.infra-ansible-collections.lock \
+ansible-playbook dbildungscloud.infra.lock \
   -e before_rollout_checks_lock_comment="Database migration" \
-  -e before_rollout_checks_lock_approx_until="2026-01-01T12:00:00Z"
+  -e before_rollout_checks_lock_approx_until="2026-01-01T12:00:00Z" \
+  -i hosts --limit "enrichment_infradev" --diff --vault-id enrichment@prompt
 ```
 - Both `-e` options are optional and informational. They are shown to others who are blocked.
 - If no lock exists, it is created. If you already hold it, the run is a no-op.
 - If someone else holds it, the playbook fails and shows who, since when and the comment.
 ### Unlock
 ```bash
-ansible-playbook dbildungsplattform.infra-ansible-collections.unlock
+ansible-playbook dbildungscloud.infra.unlock
 ```
 - **Your own lock:** it is deleted.
 - **No lock:** nothing happens, no error.
 - **Someone else's lock:** the playbook fails and tells you how to force.
 Force release regardless of the owner, for example when the owner is unavailable:
 ```bash
-ansible-playbook dbildungsplattform.infra-ansible-collections.unlock -e before_rollout_checks_lock_force=true
+ansible-playbook dbildungscloud.infra.unlock -e before_rollout_checks_lock_force=true
 ```
 The run logs `<you> forces release of lock held by <owner>`.
 ### Passing project-specific S3 settings
 ```bash
-ansible-playbook dbildungsplattform.infra-ansible-collections.lock \
+ansible-playbook dbildungscloud.infra.lock \
   -e before_rollout_checks_s3_endpoint_url=https://s3.example.com \
   -e before_rollout_checks_s3_bucket=my-project-state \
   -e before_rollout_checks_s3_access_key="$ACCESS_KEY" \
