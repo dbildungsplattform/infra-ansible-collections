@@ -58,3 +58,14 @@
         namespace: monitoring
       spec:
         itemPath: "vaults/{{ vault }}/items/victoriametrics"
+
+- name: Allow all pods in namespace monitoring networkPolicy
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    api_version: networking.k8s.io/v1
+    namespace: "monitoring"
+    template: allow-all-pods-namespace.yml.j2
+  when: monitoring_network_policy_enabled

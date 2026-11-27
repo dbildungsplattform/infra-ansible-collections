@@ -1,0 +1,17 @@
+kind: NetworkPolicy
+metadata:
+  name: allow-all-within-namespace
+  namespace: monitoring
+spec:
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchExpressions:
+              - key: kubernetes.io/metadata.name
+                operator: In
+                values:
+                  - monitoring
+                  - ingress-controller
+                  - scaling
