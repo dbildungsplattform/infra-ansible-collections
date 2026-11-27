@@ -1,6 +1,12 @@
 ---
+before_rollout_checks_scope_enabled: true
+# Local (non-AWX) non-check runs are only allowed for hosts in one of these groups
+before_rollout_checks_local_allowed_groups: []
+before_rollout_checks_force_local_rollout: "{{ force_local_rollout | default(false) }}"
+before_rollout_checks_op_token_required: true
+
 before_rollout_checks_stale_enabled: true
-before_rollout_checks_lock_enabled: true
+before_rollout_checks_lock_enabled: false
 
 before_rollout_checks_remote_name: origin
 before_rollout_checks_remote_branch: main
@@ -12,10 +18,10 @@ before_rollout_checks_repo_url: ""
 before_rollout_checks_user: "{{ awx_user_email | default(op_credentials.OP_EMAIL | default(lookup('env', 'USER'))) }}"
 
 # S3 lock location; map these to your project's variables
-before_rollout_checks_s3_endpoint_url: "{{ dbcmetrics_ionos_tf_state_s3_bucket_url }}"
-before_rollout_checks_s3_bucket: "{{ dbcmetrics_ionos_tf_state_s3_bucket_name }}"
-before_rollout_checks_s3_access_key: "{{ aws_access_key_id }}"
-before_rollout_checks_s3_secret_key: "{{ aws_secret_access_key }}"
+before_rollout_checks_s3_endpoint_url: "{{ dbcmetrics_ionos_tf_state_s3_bucket_url | default('') }}"
+before_rollout_checks_s3_bucket: "{{ dbcmetrics_ionos_tf_state_s3_bucket_name | default('') }}"
+before_rollout_checks_s3_access_key: "{{ aws_access_key_id | default('') }}"
+before_rollout_checks_s3_secret_key: "{{ aws_secret_access_key | default('') }}"
 before_rollout_checks_lock_object: .lock.json
 
 # Lock acquisition / release (set via -e or AWX survey)
