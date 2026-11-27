@@ -42,7 +42,6 @@
   loop:
     - {name: before_rollout_checks_lock_approx_until, value: "{{ before_rollout_checks_lock_approx_until }}"}
     - {name: before_rollout_checks_lock_comment, value: "{{ before_rollout_checks_lock_comment }}"}
-    - {name: before_rollout_checks_repo_url, value: "{{ before_rollout_checks_repo_url }}"}
   loop_control:
     label: "{{ item.name }}"
 
@@ -99,7 +98,9 @@
 
     - name: Check that the repo URL is set on AWX
       ansible.builtin.assert:
-        that: before_rollout_checks_repo_url | length > 0
+        that:
+          - before_rollout_checks_repo_url is string
+          - before_rollout_checks_repo_url | length > 0
         fail_msg: "before_rollout_checks_repo_url must be set when running on AWX (the project dir has no .git)."
         quiet: true
       when: awx_project_revision is defined
