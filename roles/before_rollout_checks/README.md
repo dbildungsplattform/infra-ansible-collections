@@ -166,6 +166,53 @@ Force release from the command line: `-e before_rollout_checks_lock_force=true`.
 
 This repository contains ready-made versions: `playbook-lock.yml`, `playbook-unlock.yml` and `playbook-pre-rollout-checks.yml` (targets `rollout_hosts`, default `all`).
 
+## Running the lock and unlock playbooks directly
+
+You can run the playbooks directly from this collection by FQCN,
+for example `ansible-playbook dbildungsplattform.infra-ansible-collections.lock`. The role is then referenced by its FQCN.
+
+`playbook-lock.yml` and `playbook-unlock.yml` run on `localhost` and only talk to S3, so no inventory hosts are needed. They enable the lock themselves, so `before_rollout_checks_lock_enabled` doesn't have to be set.
+### Prerequisites
+- The S3 variables resolve to non-empty values: `before_rollout_checks_s3_endpoint_url`, `_s3_bucket`, `_s3_access_key` and `_s3_secret_key`. By default they come from `dbcmetrics_ionos_tf_state_s3_bucket_url`, `dbcmetrics_ionos_tf_state_s3_bucket_name`, `aws_access_key_id` and `aws_secret_access_key`. Override them for other projects.
+- Local runs load `/localhome/ansible_vault_secrets.yml` if it exists. Add `--ask-vault-pass` or `--vault-password-file` if it is vault-encrypted.
+- Your identity (`before_rollout_checks_user`) must be set. Locally it is `op_credentials.OP_EMAIL` (from the vault secrets), falling back to `$USER`. On AWX it is `awx_user_email`.
+- The `amazon.aws` collection and `boto3` are installed.
+### Lock
+```bash
+ansible-playbook dbildungsplattform.infra-ansible-collections.lock \
+  -e before_rollout_checks_lock_comment="Database migration" \
+  -e before_rollout_checks_lock_approx_until="2026-01-01T12:00:00Z"
+```
+- Both `-e` options are optional and informational. They are shown to others who are blocked.
+- If no lock exists, it is created. If you already hold it, the run is a no-op.
+- If someone else holds it, the playbook fails and shows who, since when and the comment.
+### Unlock
+```bash
+ansible-playbook dbildungsplattform.infra-ansible-collections.unlock
+```
+- **Your own lock:** it is deleted.
+- **No lock:** nothing happens, no error.
+- **Someone else's lock:** the playbook fails and tells you how to force.
+Force release regardless of the owner, for example when the owner is unavailable:
+```bash
+ansible-playbook dbildungsplattform.infra-ansible-collections.unlock -e before_rollout_checks_lock_force=true
+```
+The run logs `<you> forces release of lock held by <owner>`.
+### Passing project-specific S3 settings
+```bash
+ansible-playbook dbildungsplattform.infra-ansible-collections.lock \
+  -e before_rollout_checks_s3_endpoint_url=https://s3.example.com \
+  -e before_rollout_checks_s3_bucket=my-project-state \
+  -e before_rollout_checks_s3_access_key="$ACCESS_KEY" \
+  -e before_rollout_checks_s3_secret_key="$SECRET_KEY"
+```
+Prefer vault variables over command-line secrets, since the latter end up in shell history.
+### Inspecting a lock
+Use the AWS CLI against the same bucket:
+```bash
+aws --endpoint-url https://s3.example.com s3 cp s3://my-project-state/.lock.json -
+```
+
 ## AWX setup
 
 - **Project:** enable "Update revision on job launch".
