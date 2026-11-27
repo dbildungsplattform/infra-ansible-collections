@@ -1,0 +1,17 @@
+---
+# Release the rollout lock. Force regardless of creator: -e before_rollout_checks_lock_force=true
+# (AWX: add a boolean survey question "before_rollout_checks_lock_force")
+- name: Release rollout lock
+  hosts: stages
+  gather_facts: false
+  pre_tasks:
+    - name: Load vault secrets in case of local rollout
+      ansible.builtin.include_vars:
+        file: /localhome/ansible_vault_secrets.yml
+      when: "'/localhome/ansible_vault_secrets.yml' is file"
+      tags: always
+  tasks:
+    - name: Release the lock
+      ansible.builtin.include_role:
+        name: before_rollout_checks
+        tasks_from: lock_release
